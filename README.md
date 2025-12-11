@@ -47,8 +47,7 @@ Open [http://localhost:5173](http://localhost:5173) and drop your images.
 
 ## 📁 Structure
 
-```
-```
+```text
 src/
 ├── components/   # UI Components
 ├── hooks/        # Custom Hooks
