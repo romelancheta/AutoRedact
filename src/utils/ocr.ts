@@ -3,6 +3,7 @@ import type { DetectedItem, DetectionSettings } from '../types';
 import { SENSITIVE_PATTERNS } from '../constants/patterns';
 import { DEFAULT_ALLOWLIST } from '../constants/config';
 import { preprocessImage } from './canvas';
+import { generateDatePatterns } from './datePatterns';
 
 // Helper: find all pattern matches with their positions
 export const findMatches = (pattern: RegExp, text: string, type: DetectedItem['type']): Array<{ text: string, type: DetectedItem['type'], index: number }> => {
@@ -11,6 +12,76 @@ export const findMatches = (pattern: RegExp, text: string, type: DetectedItem['t
     let match;
     while ((match = pattern.exec(text)) !== null) {
         matches.push({ text: match[0], type, index: match.index });
+    }
+    return matches;
+};
+
+// Helper: find block word matches (case-insensitive by default)
+export const findBlockWordMatches = (
+    blockWords: string[],
+    text: string,
+    type: DetectedItem['type']
+): Array<{ text: string, type: DetectedItem['type'], index: number }> => {
+    const matches: Array<{ text: string, type: DetectedItem['type'], index: number }> = [];
+    for (const word of blockWords) {
+        if (!word.trim()) continue;
+        // Create a case-insensitive regex with word boundaries
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(`\\b${escapedWord}\\b`, 'gi');
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+            matches.push({ text: match[0], type, index: match.index });
+        }
+    }
+    return matches;
+};
+
+// Helper: find custom date matches in multiple formats
+export const findCustomDateMatches = (
+    customDates: string[],
+    text: string,
+    type: DetectedItem['type']
+): Array<{ text: string, type: DetectedItem['type'], index: number }> => {
+    const matches: Array<{ text: string, type: DetectedItem['type'], index: number }> = [];
+    for (const dateStr of customDates) {
+        const patterns = generateDatePatterns(dateStr);
+        for (const pattern of patterns) {
+            pattern.lastIndex = 0;
+            let match: RegExpExecArray | null;
+            while ((match = pattern.exec(text)) !== null) {
+                // Avoid duplicate matches at the same position
+                const matchIndex = match.index;
+                const matchText = match[0];
+                const exists = matches.some(m => m.index === matchIndex && m.text === matchText);
+                if (!exists) {
+                    matches.push({ text: matchText, type, index: matchIndex });
+                }
+            }
+        }
+    }
+    return matches;
+};
+
+// Helper: find custom regex matches
+export const findCustomRegexMatches = (
+    customRegex: DetectionSettings['customRegex'],
+    text: string,
+    type: DetectedItem['type']
+): Array<{ text: string, type: DetectedItem['type'], index: number }> => {
+    const matches: Array<{ text: string, type: DetectedItem['type'], index: number }> = [];
+    for (const rule of customRegex) {
+        try {
+            const flags = rule.caseSensitive ? 'g' : 'gi';
+            const pattern = new RegExp(rule.pattern, flags);
+            pattern.lastIndex = 0;
+            let match;
+            while ((match = pattern.exec(text)) !== null) {
+                matches.push({ text: match[0], type, index: match.index });
+            }
+        } catch {
+            // Skip invalid patterns (should be validated on input, but be safe)
+            console.warn(`Skipping invalid regex pattern: ${rule.pattern}`);
+        }
     }
     return matches;
 };
@@ -29,6 +100,26 @@ export const filterAllowlistedMatches = <T extends { text: string }>(
     return matches.filter(match => !isAllowlisted(match.text, allowlist));
 };
 
+// Helper: check if word has valid overlap with a match (both positional and text-based)
+export const hasValidOverlap = (
+    wordStart: number,
+    wordEnd: number,
+    wordText: string,
+    matchStart: number,
+    matchEnd: number,
+    matchText: string
+): boolean => {
+    // Check positional overlap: (StartA < EndB) and (EndA > StartB)
+    const hasPositionalOverlap = wordStart < matchEnd && wordEnd > matchStart;
+    if (!hasPositionalOverlap) return false;
+    
+    // Additional text-based validation to avoid over-redaction:
+    // The word should contain the match text, or vice versa
+    const wordLower = wordText.toLowerCase();
+    const matchLower = matchText.toLowerCase();
+    return wordLower.includes(matchLower) || matchLower.includes(wordLower);
+};
+
 // Default settings for backward compatibility (all enabled)
 const DEFAULT_DETECTION_SETTINGS: DetectionSettings = {
     email: true,
@@ -37,6 +128,9 @@ const DEFAULT_DETECTION_SETTINGS: DetectionSettings = {
     secret: true,
     pii: true,
     allowlist: DEFAULT_ALLOWLIST,
+    blockWords: [],
+    customDates: [],
+    customRegex: [],
 };
 
 interface ProcessImageOptions {
@@ -154,6 +248,12 @@ export const processImageForBatch = async (
         });
     }
 
+    // 6. Custom Rules: Block Words, Custom Dates, Custom Regex (all treated as 'pii' type)
+    const blockWordMatches = findBlockWordMatches(detectionSettings.blockWords || [], fullText, 'pii');
+    const customDateMatches = findCustomDateMatches(detectionSettings.customDates || [], fullText, 'pii');
+    const customRegexMatches = findCustomRegexMatches(detectionSettings.customRegex || [], fullText, 'pii');
+    const customMatches = [...blockWordMatches, ...customDateMatches, ...customRegexMatches];
+
     // Apply allowlist filtering to all match types
     const allowlist = detectionSettings.allowlist || [];
     const filteredEmailMatches = filterAllowlistedMatches(emailMatches, allowlist);
@@ -161,8 +261,9 @@ export const processImageForBatch = async (
     const filteredCcMatches = filterAllowlistedMatches(ccMatches, allowlist);
     const filteredPiiMatches = filterAllowlistedMatches(piiMatches, allowlist);
     const filteredSecretMatches = filterAllowlistedMatches(secretMatches, allowlist);
+    const filteredCustomMatches = filterAllowlistedMatches(customMatches, allowlist);
 
-    const allMatches = [...filteredEmailMatches, ...filteredIpMatches, ...filteredCcMatches, ...filteredPiiMatches, ...filteredSecretMatches];
+    const allMatches = [...filteredEmailMatches, ...filteredIpMatches, ...filteredCcMatches, ...filteredPiiMatches, ...filteredSecretMatches, ...filteredCustomMatches];
 
     console.log(`[Batch] Matches for ${file.name}:`, {
         emails: filteredEmailMatches.map(m => m.text),
@@ -170,15 +271,17 @@ export const processImageForBatch = async (
         creditCards: filteredCcMatches.map(m => m.text),
         secrets: filteredSecretMatches.map(m => m.text),
         pii: filteredPiiMatches.map(m => m.text),
+        custom: filteredCustomMatches.map(m => m.text),
     });
 
     // Create Stats Breakdown (Count actual entities, not redaction boxes)
+    // Custom matches are included in PII count for simplicity
     const detectedBreakdown = {
         emails: filteredEmailMatches.length,
         ips: filteredIpMatches.length,
         creditCards: filteredCcMatches.length,
         secrets: filteredSecretMatches.length,
-        pii: filteredPiiMatches.length,
+        pii: filteredPiiMatches.length + filteredCustomMatches.length,
     };
     const detectedCount = Object.values(detectedBreakdown).reduce((a, b) => a + b, 0);
 
@@ -200,13 +303,10 @@ export const processImageForBatch = async (
                             const wordStart = index;
                             const wordEnd = index + wordText.length;
 
-                            // Check for spatial overlap with any sensitive match
-                            // Overlap condition: (StartA < EndB) and (EndA > StartB)
-                            const match = allMatches.find(m => {
-                                const matchStart = m.index;
-                                const matchEnd = m.index + m.text.length;
-                                return wordStart < matchEnd && wordEnd > matchStart;
-                            });
+                            // Check for spatial overlap with any sensitive match using helper
+                            const match = allMatches.find(m => 
+                                hasValidOverlap(wordStart, wordEnd, wordText, m.index, m.index + m.text.length, m.text)
+                            );
 
                             if (match) {
                                 detected.push({ text: wordText, type: match.type, bbox: word.bbox });
